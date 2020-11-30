@@ -1,0 +1,13 @@
+@font-face {
+	font-family: "Hind";
+	src: url("../src/fonts/Hind/Hind-Regular.ttf");
+	font-style: normal;
+	font-weight: normal;
+}
+
+@font-face {
+	font-family: "Hind";
+	src: url("../src/fonts/Hind/Hind-Bold.ttf");
+	font-style: normal;
+	font-weight: bold;
+}

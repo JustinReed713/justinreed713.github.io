@@ -1,0 +1,18 @@
+.header-section {
+    min-height: 100px;
+	width: 100%;
+	
+	box-shadow: 1px 0px 2px 0px white;
+}
+
+.header-section__wrapper {
+    height: 100%;
+    
+	padding: 0px 15px;
+}
+
+.header-section__logo {
+	width: 85px;
+
+	z-index: 21;
+}

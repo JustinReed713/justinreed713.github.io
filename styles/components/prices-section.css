@@ -1,0 +1,93 @@
+.prices-section {
+	min-height: 780px;
+}
+
+.prices-section__wrapper{
+	flex-wrap: wrap;
+}
+
+.kit-container {
+	width: 380px;
+
+	padding: 70px 45px;
+
+	border: 1px solid #fafafa;
+}
+
+.kit-container_center {
+	padding: 110px 45px;
+}
+
+.kit-container__wrapper {
+	height: 400px;
+}
+
+.kit-title {
+	font-size: 22px;
+	font-weight: bold;
+}
+
+.kit-title__name {
+	display: inline;
+}
+
+.kit-title__price {
+	display: inline;
+}
+
+.kit-title__price::before {
+	content: "-$";
+
+	color: #bfc1c7;
+	font-size: 14px;
+
+	margin-right: 5px;
+}
+
+.kit-advantages {
+	font-size: 13px;
+	color: #81848f;
+}
+
+.kit-container__kit-advantages {
+	margin-bottom: 10px;
+}
+
+.kit-advantages__point::before {
+	display: inline-block;
+
+	content: "";
+
+	width: 6px;
+	height: 2px;
+
+	background-color: #17bed2;
+
+	margin-right: 8px;
+	margin-bottom: 3px;
+}
+
+.kit-container__link {
+	cursor: pointer;
+
+	font-weight: 600;
+	
+	background-color: #f3f4f5;
+
+	font-size: 14px;
+	padding: 13px 0px;
+
+	text-align: center;
+
+	width: 110px;
+
+	transition-property: background-color, color;
+	transition-timing-function: ease-in-out;
+	transition-duration: 0.5s;
+}
+
+.kit-container__link:hover {
+	background-color: #17bed2;
+
+	color: white;
+}

@@ -1,0 +1,38 @@
+.sponsors-section {
+	min-height: 250px;
+
+	user-select: none;
+}
+
+.sponsors-section__viewport {
+	overflow-x: scroll;
+
+	scroll-snap-type: x mandatory;
+	-webkit-overflow-scrolling: scroll;
+
+	padding: 30px 0px;
+}
+
+.sponsors-section__viewport::-webkit-scrollbar {
+	width: 0px;
+}
+
+.sponsors-section__wrapper {
+	min-width: 1380px;
+}
+
+.sponsor-link {
+	width: 190px;
+
+	display: block;
+
+	scroll-snap-align: center;
+}
+
+.sponsor-link__wrapper {
+	margin: 0px 20px;
+}
+
+.sponsor-link__logo {
+	width: 100%;
+}
