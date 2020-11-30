@@ -12,6 +12,8 @@
 	max-width: 580px;
 
 	padding: 0px 15px;
+
+	margin-bottom: 15px;
 }
 
 .products-section__title {
@@ -31,7 +33,7 @@
 }
 
 .product {
-	width: 390px;
+	width: 380px;
 	height: 405px;
 
 	padding: 0px 15px;
