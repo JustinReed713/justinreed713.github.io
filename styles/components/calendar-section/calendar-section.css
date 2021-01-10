@@ -1,0 +1,23 @@
+@import "./date-time-segment/date-time-segment.css";
+@import "./month-segment/month-segment.css";
+@import "./settings-segment/settings-segment.css";
+
+.calendar-section{
+    user-select: none;
+
+    color: var(--colorSecondary);
+
+    font-family: "Jura", Verdana, Tahoma, sans-serif;
+    font-weight: lighter;
+
+    padding: 10px 30px 10px 10px;
+
+    border-right: 1px solid var(--colorInactiveElements);
+}
+
+.calendar-section__settings-segment {
+    position: absolute;
+
+    top: 40px;
+    right: 40px;
+}

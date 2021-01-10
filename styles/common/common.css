@@ -1,0 +1,94 @@
+.common-flex-center-center {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.common-flex-row-between-center {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.common-flex-column-center-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.common-flex-column-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.common-flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.common-flex-row-align {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.common-flex-row-align-wrap {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.common-flex-row-start-start {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: flex-start;
+}
+
+.common-flex-row-center-stretch {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: stretch;
+}
+
+.common-margin_2px {
+    margin: 2px;
+}
+
+.common_margin-left_5px {
+    margin-left: 5px;
+}
+
+.common_padding-right_4px {
+    padding-right: 4px;
+}
+
+.common_sections-width {
+    width: 480px;
+}
+
+.common_font-size_1d4em{
+    font-size: 1.4em;
+}
+
+.common_font-size_1d8em{
+    font-size: 1.8em;
+}
+
+.common_text-transform_capitalize {
+    text-transform: capitalize;
+}
+
+.common_visibility_hidden{
+    visibility: hidden;
+}
+
+.common_padding_left_10px {
+    padding-left: 10px;
+}

@@ -1,0 +1,15 @@
+@import "./date-control/date-control.css";
+
+.date-selector{
+    width: 100%;
+
+    padding-left: 2.7em;
+}
+
+.date-selector__date-control-wrapper{
+    order: -1;
+}
+
+.date-selector-wrapper__hint{
+    cursor: pointer;
+}

@@ -1,0 +1,23 @@
+.days-container {
+	width: calc(var(--dayBoxSize) * 7);
+	height: calc(var(--dayBoxSize) * 6);
+
+	overflow: hidden;
+}
+
+.days-container__background {
+	width: calc(var(--dayBoxSize)*4);
+	height: calc(var(--dayBoxSize)*4);
+
+	border-radius: 50%;
+
+	background: radial-gradient(var(--colorInactiveElements) 0%, transparent 80%);
+
+	position: absolute;
+
+	opacity: 0;
+}
+
+.days-container:hover .days-container__background {
+	opacity: 1;
+}

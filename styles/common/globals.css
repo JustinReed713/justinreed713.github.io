@@ -1,0 +1,6 @@
+:root {
+    --dayBoxSize: 60px;
+    --colorInactiveElements: rgba(255, 255, 255, 0.3);
+    --colorPrimary: rgb(8, 17, 46);
+    --colorSecondary: rgb(255, 255, 255);
+}

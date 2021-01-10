@@ -1,0 +1,11 @@
+{
+    "settings": {
+        "isFirstDaySunday": true,
+        "isSiblingsMonthsShowed": true,
+        "isScheduleActive": true,
+        "holidaysIndex": [
+            0,
+            6
+        ]
+    }
+}

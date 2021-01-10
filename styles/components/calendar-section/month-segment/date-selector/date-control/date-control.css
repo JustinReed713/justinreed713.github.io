@@ -1,0 +1,44 @@
+
+
+.date-control__switch-button {
+    visibility: hidden;
+    opacity: 0;
+
+    width: 100%;
+
+    text-align: center;
+
+    order: 0;
+
+    transition: opacity ease 0.3s;
+
+    margin-bottom: -7px;
+}
+
+.date-control__switch-button_increase{
+    order: -1;
+}
+
+.date-control__switch-button_decrease{
+    order: 999;
+}
+
+.date-control__caption{
+    width: 5.8em;
+
+    text-align: center;
+
+    padding: 0px 9px 4px 3px;
+}
+
+#date-control-year{
+    width: fit-content;
+}
+
+.date-control:hover .date-control__switch-button{
+    visibility: visible;
+
+    opacity: 1;
+
+    cursor: pointer;
+}

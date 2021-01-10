@@ -1,0 +1,48 @@
+.day-box {
+	width: var(--dayBoxSize);
+	height: var(--dayBoxSize);
+
+	text-align: center;
+	z-index: 2;
+}
+
+.day-box:hover {
+	border: 1px solid var(--colorSecondary);
+}
+
+.day-box_active {
+	border: 1px solid var(--colorSecondary);
+}
+
+.day-box_holiday {
+	color: red;
+}
+
+.day-box_color_other-month {
+	color: var(--colorInactiveElements);
+
+	border-color: var(--colorInactiveElements);
+}
+
+.day-box_borderless {
+	border-color: transparent;
+}
+
+.day-box_borderless:hover {
+	border-color: transparent;
+}
+
+.day-box__content {
+	width: calc(var(--dayBoxSize) - 8px);
+	height: calc(var(--dayBoxSize) - 8px);
+
+	background-color: var(--colorPrimary);
+}
+
+.day-box__date {
+	font-size: 2em;
+}
+
+.day-box_borderless .day-box__content .day-box__date {
+	font-size: 1.5em;
+}

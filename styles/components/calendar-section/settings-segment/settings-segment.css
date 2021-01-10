@@ -1,0 +1,7 @@
+.settings-segment{
+    cursor: pointer;
+}
+
+.settings-segment__button {
+    border: none;
+}
