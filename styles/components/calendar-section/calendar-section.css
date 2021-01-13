@@ -16,8 +16,10 @@
 }
 
 .calendar-section__settings-segment {
-    position: absolute;
+    /* position: absolute;
 
-    top: 40px;
-    right: 40px;
+    bottom: 10px;
+    right: 40px; */
+
+    z-index: 60;
 }

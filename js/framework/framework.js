@@ -151,11 +151,6 @@ class Framework {
         return domElement;
     }
 
-    static concatElementInnerHtml(domElement, htmlCode) {
-        domElement.innerHTML += Framework.portalXssDefence(htmlCode);
-        return domElement;
-    }
-
     /**
      * Clear inner HTML code of selected DOM element.
      * @param {Element} domElement - Selected DOM element.
@@ -367,7 +362,7 @@ class BeautifiedButton {
     }
 
     static bindClickAnimation(domElement) {
-        domElement.addEventListener("click", () => {
+        domElement.addEventListener("click", (event) => {
             const ripple = Framework.createDivElement();
             Framework.setElementClass(ripple, ["beautified-button__ripple"]);
             domElement.appendChild(ripple);

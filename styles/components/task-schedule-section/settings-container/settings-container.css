@@ -1,5 +1,10 @@
 .settings-container{
     width: 100%;
+    height: 100%;
+}
+
+.settings-container-wrapper {
+    width: 100%;
 }
 
 .settings-container__header{
@@ -54,6 +59,11 @@
     padding: 0px 10px;
 }
 
+.settings-container__control-buttons-wrapper {
+    position: relative;
+
+    z-index: 50;
+}
 
 .control-buttons-wrapper{
     width: 100%;

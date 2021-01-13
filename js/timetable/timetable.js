@@ -5,10 +5,28 @@ class Timetable {
                 isFirstDaySunday: true,
                 isSiblingsMonthsShowed: true,
                 isScheduleActive: true,
-                holidaysIndex: [0, 6]
+                holidaysIndex: [0, 6],
+                holidaysList: {
+                    everyYear: {
+                        0: {
+                            1: "New Year"
+                        },
+                        2: {
+                            8: "Womans day"
+                        }
+                    },
+                    manual: {
+                        2021: {
+                            8: {
+                                13: "Programmers day"
+                            }
+                        }
+                    }
+                }
             },
             selectedMonthIncrement: 0,
-            isSettingsOpen: false
+            isSettingsOpen: false,
+            weatherForecastData: {}
         };
         this.previousState = {};
         this.monthArrayEn = [
@@ -34,7 +52,7 @@ class Timetable {
             "Friday",
             "Saturday"
         ];
-        this.initTimetable();
+        this.requestWeatherForecastData();
         this.setPreviousState(this.state);
     }
 
@@ -62,6 +80,10 @@ class Timetable {
 
     setSettingsOpen(value) {
         this.state.isSettingsOpen = value;
+    }
+
+    setWeatherForecastData(value) {
+        this.state.weatherForecastData = value;
     }
 
     setPreviousState(currentState) {
@@ -94,12 +116,20 @@ class Timetable {
         return this.getCurrentState().settings.holidaysIndex;
     }
 
+    getHolidaysList() {
+        return this.getCurrentState().settings.holidaysList
+    }
+
     getCurrentDate() {
         return (new Date());
     };
 
     getSettingsOpen() {
         return this.getCurrentState().isSettingsOpen
+    }
+
+    getWeatherForecastData() {
+        return this.getCurrentState().weatherForecastData
     }
 
     getPreviousSelectedMonthIncrement() {
@@ -176,6 +206,41 @@ class Timetable {
         const activeScheduleSelect = document.getElementById("schedule-active");
         this.setScheduleActive(activeScheduleSelect.checked)
     }
+
+    requestWeatherForecastData() {
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition);
+        } else {
+            console.warn("Geolocation is not supported by this browser.");
+        }
+
+        const object = this;
+
+        function showPosition(position) {
+            fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${position.coords.latitude}&lon=${position.coords.longitude}&exclude=minutely,alerts&units=metric&appid=fa89f5efb789b4e5e23e5761db403636`)
+                .then(response => response.json())
+                .then((data) => {
+                    object.setWeatherForecastData(data)
+                    console.log(object.getWeatherForecastData())
+                    object.initTimetable();
+                });
+
+        }
+    }
+
+    // dayTypeDetermination(dateMark) {
+    //     const year = dateMark.getFullYear();
+    //     const month = dateMark.getMonth();
+    //     const day = dateMark.getDay();
+    //     if () {
+    //         return "holiday"
+    //     } else if(){
+    //         return "weekend"
+    //     } else {
+    //         return "workday"
+    //     }
+    // }
 
     /* activities */
 
@@ -394,9 +459,19 @@ class Timetable {
      * Render Calendar section of app
      */
     renderCalendarSection() {
-        const injectedHtml = `  <div class="date-time-segment calendar-section_date-time-segment">
-                                    <div class="time-component date-time-segment__time-component"></div>
-                                    <div class="date-component date-component-wrapper__date-component"></div>
+        const injectedHtml = `  <div class="date-time-weather-wrapper common-flex-row-between-center">
+                                    <div class="date-time-segment calendar-section__date-time-segment">
+                                        <div class="time-component date-time-segment__time-component"></div>
+                                        <div class="date-component date-component-wrapper__date-component"></div>
+                                    </div>
+                                    <div class="day-weather-segment calendar-section__day-weather-segment common-flex-column-between-center">
+                                        <div class="temperature-icon-wrapper day-weather-segment__temperature-icon-wrapper common-flex-row-between-center">
+                                            <div class="temperature-icon-wrapper__temperature-value"></div>
+                                            <img class="temperature-icon-wrapper__weather-icon">
+                                        </div>
+                                        <div class="day-weather-segment__weather-description"></div>
+                                        <div class="day-weather-segment__feels-like"></div>
+                                    </div>
                                 </div>
                                 <div class="month-segment calendar-section__month-segment common-flex-column-center-center">
                                     <div class="date-selector month-segment__date-selector common-flex-row-between-center">
@@ -413,24 +488,26 @@ class Timetable {
 
     renderTaskScheduleSection() {
         const injectedHtml = ``;
-        Framework.initDomPortal("main-container__wrapper", ["main-container__task-schedule-section", "common_sections-width", "common-flex-center-center"], injectedHtml, ["task-schedule-section"]);
+        Framework.initDomPortal("main-container__wrapper", ["main-container__task-schedule-section", "common_sections-width"], injectedHtml, ["task-schedule-section"]);
     }
 
     renderSettingsContainer() {
-        const injectedHtml = `<div class="settings-container__header common_padding_left_10px">Settings</div>
-                              <div class="settings-option settings-option_first-day-week settings-container__settings-option common-flex-column">
-                                <div class="settings-option__caption common_padding_left_10px">Select the 1st day of the week:</div>
-                              </div>
-                              <div class="settings-option settings-container__settings-option settings-option_weekends-select common-flex-column">
-                                <div class="settings-option__caption common_padding_left_10px">Select weekends:</div>
-                              </div>
-                              <div class="settings-option settings-option_one-line settings-container__settings-option settings-option_other-month-show common-flex-row-between-center">
-                                <div class="settings-option__caption common_padding_left_10px">Show another months days</div>
-                              </div>
-                              <div class="settings-option settings-option_one-line settings-container__settings-option settings-option_schedule-active common-flex-row-between-center">
-                                <div class="settings-option__caption common_padding_left_10px">Task schedule active</div>
+        const injectedHtml = `<div class="settings-container-wrapper common-flex-column-center">
+                                  <div class="settings-container__header common_padding_left_10px">Settings</div>
+                                  <div class="settings-option settings-option_first-day-week settings-container__settings-option common-flex-column">
+                                  <div class="settings-option__caption common_padding_left_10px">Select the 1st day of the week:</div>
+                                  </div>
+                                  <div class="settings-option settings-container__settings-option settings-option_weekends-select common-flex-column">
+                                  <div class="settings-option__caption common_padding_left_10px">Select weekends:</div>
+                                  </div>
+                                  <div class="settings-option settings-option_one-line settings-container__settings-option settings-option_other-month-show common-flex-row-between-center">
+                                  <div class="settings-option__caption common_padding_left_10px">Show another months days</div>
+                                  </div>
+                                  <div class="settings-option settings-option_one-line settings-container__settings-option settings-option_schedule-active common-flex-row-between-center">
+                                  <div class="settings-option__caption common_padding_left_10px">Task schedule active</div>
+                                  </div>
                               </div>`;
-        Framework.initDomPortal("task-schedule-section", ["task-schedule-section__settings-container", "common-flex-column-center"], injectedHtml, ["settings-container"]);
+        Framework.initDomPortal("task-schedule-section", ["task-schedule-section__settings-container", "common-flex-column-between-center"], injectedHtml, ["settings-container"]);
     }
 
     /**
@@ -452,7 +529,7 @@ class Timetable {
                 object.initSettingsContainer();
             }
         }
-        BeautifiedButton.new(parent, "", callSettingsClick, ["settings-segment__button"], iconHtmlCode);
+        BeautifiedButton.new(parent, "Settings", callSettingsClick, ["settings-segment__button"], iconHtmlCode);
     }
 
     renderFirstDayWeekSelect() {
@@ -531,9 +608,25 @@ class Timetable {
     }
 
     renderDaySummary() {
-        const injectedHtml = `<div class="day-summary__day-type"></div>
+        const dayType = this.dayTypeDetermination();
+        const injectedHtml = `<div class="day-summary__day-type">This day is${dayType}</div>
                               <div class="day-summary__day-info"></div>`;
         Framework.initDomPortal("main-container__task-schedule-section", ["common-flex-column"], injectedHtml, ["day-summary", "task-schedule-section__day-summary"]);
+    }
+
+    renderWeatherInfo() {
+        const dayTemperature = Framework.getFirstElementByClassName("temperature-icon-wrapper__temperature-value");
+        const dayTemperatureValue = this.getWeatherForecastData().current.temp;
+        Framework.injectElementInnerText(dayTemperature, `${dayTemperatureValue} ℃`)
+        const weatherIcon = Framework.getFirstElementByClassName("temperature-icon-wrapper__weather-icon");
+        const weatherIconValue = this.getWeatherForecastData().current.weather[0].icon;
+        Framework.setDomElementAttribute(weatherIcon, `http://openweathermap.org/img/wn/${weatherIconValue}@2x.png`, "src");
+        const weatherDescription = Framework.getFirstElementByClassName("day-weather-segment__weather-description");
+        const weatherDescriptionValue = this.getWeatherForecastData().current.weather[0].description;
+        Framework.injectElementInnerText(weatherDescription, weatherDescriptionValue);
+        const feelsLike = Framework.getFirstElementByClassName("day-weather-segment__feels-like");
+        const feelsLikeValue = this.getWeatherForecastData().current.feels_like;
+        Framework.injectElementInnerText(feelsLike, `Feels like ${feelsLikeValue}`);
     }
 
     initSettingsContainer() {
@@ -546,7 +639,7 @@ class Timetable {
     }
 
     initDaySummary() {
-        this.renderDaySummary();
+        //this.renderDaySummary();
     }
 
     //--------------------------//
@@ -563,6 +656,8 @@ class Timetable {
         /* test */
 
         this.initDaySummary();
+        this.renderWeatherInfo();
+        
     }
 
     //--------------------------//
