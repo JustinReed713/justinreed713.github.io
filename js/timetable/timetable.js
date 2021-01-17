@@ -1,16 +1,7 @@
 class Timetable {
     constructor() {
         this.state = {
-            settings: {
-                holidaysList: {
-                    everyYear: { 0: { 1: "New Year" }, 2: { 8: "Womans day" } },
-                    manual: { 2021: { 8: { 13: "Programmers day" } } }
-                },
-                isFirstDaySunday: true,
-                isSiblingsMonthsShowed: true,
-                isScheduleActive: true,
-                holidaysIndex: [0, 6]
-            },
+            settings: settings,
             selectedMonthIncrement: 0,
             isSettingsOpen: false,
             selectedDate: this.getCurrentDate(),
@@ -43,6 +34,7 @@ class Timetable {
             "Saturday"
         ];
         //this.requestWeatherForecastData();
+        //this.getSettingsRequest();
         this.initTimetable();
         this.setPreviousState(this.state);
     }
@@ -128,6 +120,16 @@ class Timetable {
     };
 
     getSettingsRequest() {
+        // if(this.state.settings === null) {
+        //     this.setSettings(settings)
+        // }
+
+        // const reader = new FileReader();
+        // reader.readAsText("./config.json");
+        // reader.onload = function () {
+        //     console.log(reader.result)
+        // }
+
         function readTextFile(file, callback) {
             var rawFile = new XMLHttpRequest();
             rawFile.overrideMimeType("application/json");
@@ -137,11 +139,11 @@ class Timetable {
                     callback(rawFile.responseText);
                 }
             }
-            rawFile.send();
+            rawFile.send(null);
         }
 
         //usage:
-        readTextFile("./settings.json", function (text) {
+        readTextFile("./config.json", function (text) {
             var data = JSON.parse(text);
             console.log(data);
         });
