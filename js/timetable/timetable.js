@@ -2,31 +2,21 @@ class Timetable {
     constructor() {
         this.state = {
             settings: {
+                holidaysList: {
+                    everyYear: { 0: { 1: "New Year" }, 2: { 8: "Womans day" } },
+                    manual: { 2021: { 8: { 13: "Programmers day" } } }
+                },
                 isFirstDaySunday: true,
                 isSiblingsMonthsShowed: true,
                 isScheduleActive: true,
-                holidaysIndex: [0, 6],
-                holidaysList: {
-                    everyYear: {
-                        0: {
-                            1: "New Year"
-                        },
-                        2: {
-                            8: "Womans day"
-                        }
-                    },
-                    manual: {
-                        2021: {
-                            8: {
-                                13: "Programmers day"
-                            }
-                        }
-                    }
-                }
+                holidaysIndex: [0, 6]
             },
             selectedMonthIncrement: 0,
             isSettingsOpen: false,
-            weatherForecastData: {}
+            selectedDate: this.getCurrentDate(),
+            userPosition: {},
+            weatherForecastData: {},
+            userLocationData: {}
         };
         this.previousState = {};
         this.monthArrayEn = [
@@ -52,7 +42,8 @@ class Timetable {
             "Friday",
             "Saturday"
         ];
-        this.requestWeatherForecastData();
+        //this.requestWeatherForecastData();
+        this.initTimetable();
         this.setPreviousState(this.state);
     }
 
@@ -86,9 +77,21 @@ class Timetable {
         this.state.weatherForecastData = value;
     }
 
+    setUserPosition(value) {
+        this.state.userPosition = value;
+    }
+
+    setUserLocationData(value) {
+        this.state.userLocationData = value;
+    }
+
     setPreviousState(currentState) {
         this.previousState = JSON.parse(JSON.stringify(currentState));
     };
+
+    setSettings(value) {
+        this.state.settings = value;
+    }
 
     /* getters */
 
@@ -124,12 +127,36 @@ class Timetable {
         return (new Date());
     };
 
+    getSettingsRequest() {
+        function readTextFile(file, callback) {
+            var rawFile = new XMLHttpRequest();
+            rawFile.overrideMimeType("application/json");
+            rawFile.open("GET", file, true);
+            rawFile.onreadystatechange = function () {
+                if (rawFile.readyState === 4 && rawFile.status == "200") {
+                    callback(rawFile.responseText);
+                }
+            }
+            rawFile.send();
+        }
+
+        //usage:
+        readTextFile("./settings.json", function (text) {
+            var data = JSON.parse(text);
+            console.log(data);
+        });
+    }
+
     getSettingsOpen() {
         return this.getCurrentState().isSettingsOpen
     }
 
     getWeatherForecastData() {
         return this.getCurrentState().weatherForecastData
+    }
+
+    getUserLocationData() {
+        return this.getCurrentState().userLocationData
     }
 
     getPreviousSelectedMonthIncrement() {
@@ -141,6 +168,16 @@ class Timetable {
         const selectedMonth = this.getCurrentDate().getMonth() + this.getSelectedMonthIncrement();
         const currentMonthDay = this.getCurrentDate().getDate();
         return new Date(currentYear, selectedMonth, currentMonthDay);
+    }
+
+    getUserPosition() {
+        return this, this.getCurrentState().userPosition;
+    }
+
+    getCurrentPosition() {
+        return new Promise(
+            (resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject)
+        )
     }
 
     /* mixin */
@@ -175,6 +212,85 @@ class Timetable {
 
     /* additional */
 
+    callPositionRequest(additionalFunction, callObject) {
+        const object = this;
+        this.getCurrentPosition()
+            .then(position => {
+                if (position.coords) {
+                    const locationData = { latitude: position.coords.latitude, longitude: position.coords.longitude }
+                    object.setUserPosition(locationData)
+                } else {
+                    console.error('Geolocation is not supported by this browser.');
+                }
+                return position;
+            }
+            ).then(
+                position => {
+                    if (additionalFunction) {
+                        additionalFunction(position, callObject);
+                    }
+                    return position;
+                }
+            ).catch(
+                error => console.error(error)
+            )
+    }
+
+
+    makeRequest() {
+        const object = this;
+        this.callPositionRequest(object.combinedRequest, object)
+    }
+
+
+
+
+    requestWeatherForecastData(additionalFunction, callObject) {
+        const latitude = callObject.getUserPosition().latitude;
+        const longitude = callObject.getUserPosition().longitude;
+        fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&exclude=minutely,alerts&units=metric&appid=fa89f5efb789b4e5e23e5761db403636`)
+            .then(response => response.json())
+            .then(data => {
+                callObject.setWeatherForecastData(data);
+                return data;
+            })
+            .then(data => {
+                if (additionalFunction) {
+                    additionalFunction(data, callObject)
+                }
+                return data;
+            });
+
+    }
+
+    requestUserLocation(additionalFunction, callObject) {
+        const coordinatesRequest = `${callObject.getUserPosition().longitude},${callObject.getUserPosition().latitude}`;
+        fetch(`https://geocode-maps.yandex.ru/1.x/?apikey=2317cb5b-df6a-48f6-b15f-abd253896d8b&geocode=${coordinatesRequest}&format=json&lang=en_US`)
+            .then(response => response.json())
+            .then(data => {
+                callObject.setUserLocationData(data);
+                return data
+            })
+            .then(data => {
+                if (additionalFunction) {
+                    additionalFunction(data, callObject)
+                }
+                return data;
+            });
+    }
+
+    combinedRequest(data, object) {
+        object.requestWeatherForecastData(() => { }, object);
+        object.requestUserLocation(() => { }, object);
+    }
+
+
+
+
+
+
+
+
     makeDateString(timeMark) {
         return `${timeMark.getDate()} ${this.monthArrayEn[timeMark.getMonth()]} ${timeMark.getFullYear()}`;
     };
@@ -207,40 +323,27 @@ class Timetable {
         this.setScheduleActive(activeScheduleSelect.checked)
     }
 
-    requestWeatherForecastData() {
 
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(showPosition);
-        } else {
-            console.warn("Geolocation is not supported by this browser.");
+
+    dayTypeDetermination() {
+        const dateCorrection = (this.getFirstDay() === false) ? 1 : 0;
+        const currentDay = this.getCurrentDate().getDate() - dateCorrection;
+        let holidaysIndex = this.getHolidaysIndex();
+        if (this.getFirstDay() === false) {
+            holidaysIndex = holidaysIndex.map((item) => {
+                const result = item - 1;
+                if (result === -1) {
+                    return 6
+                }
+                return result
+            })
         }
-
-        const object = this;
-
-        function showPosition(position) {
-            fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${position.coords.latitude}&lon=${position.coords.longitude}&exclude=minutely,alerts&units=metric&appid=fa89f5efb789b4e5e23e5761db403636`)
-                .then(response => response.json())
-                .then((data) => {
-                    object.setWeatherForecastData(data)
-                    console.log(object.getWeatherForecastData())
-                    object.initTimetable();
-                });
-
+        if (holidaysIndex.includes(currentDay) === true) {
+            return "weekend"
+        } else {
+            return "workday"
         }
     }
-
-    // dayTypeDetermination(dateMark) {
-    //     const year = dateMark.getFullYear();
-    //     const month = dateMark.getMonth();
-    //     const day = dateMark.getDay();
-    //     if () {
-    //         return "holiday"
-    //     } else if(){
-    //         return "weekend"
-    //     } else {
-    //         return "workday"
-    //     }
-    // }
 
     /* activities */
 
@@ -353,7 +456,7 @@ class Timetable {
         if ((date instanceof Date) === false) {
             date = this.getCurrentDate();
         }
-        const daysContainer = document.getElementsByClassName("days-container")[0];
+        const daysContainer = document.getElementsByClassName("days-container__month-wrapper")[0];
         Framework.clearElementInnerHtml(daysContainer);
         this.fillDaysOfMonth(daysContainer, date);
     }
@@ -464,21 +567,15 @@ class Timetable {
                                         <div class="time-component date-time-segment__time-component"></div>
                                         <div class="date-component date-component-wrapper__date-component"></div>
                                     </div>
-                                    <div class="day-weather-segment calendar-section__day-weather-segment common-flex-column-between-center">
-                                        <div class="temperature-icon-wrapper day-weather-segment__temperature-icon-wrapper common-flex-row-between-center">
-                                            <div class="temperature-icon-wrapper__temperature-value"></div>
-                                            <img class="temperature-icon-wrapper__weather-icon">
-                                        </div>
-                                        <div class="day-weather-segment__weather-description"></div>
-                                        <div class="day-weather-segment__feels-like"></div>
-                                    </div>
+                                    <div class="day-weather-segment calendar-section__day-weather-segment common-flex-column-between-center"></div>
                                 </div>
                                 <div class="month-segment calendar-section__month-segment common-flex-column-center-center">
                                     <div class="date-selector month-segment__date-selector common-flex-row-between-center">
                                         <div class="date-selector-wrapper__hint common-flex-center-center common_font-size_1d4em common_visibility_hidden"><span class="material-icons common_padding-right_4px"> restore </span>Click to restore date</div>
                                     </div>
                                     <div class="days-week-header month-segment__calendar-header common-flex-row-align"></div>
-                                    <div class="days-container month-segment__days-container common-flex-row-align-wrap">
+                                    <div class="days-container month-segment__days-container">
+                                        <div class="days-container__month-wrapper common-flex-row-align-wrap"></div>
                                         <div class="days-container__background"></div>
                                     </div>
                                 </div>
@@ -495,16 +592,16 @@ class Timetable {
         const injectedHtml = `<div class="settings-container-wrapper common-flex-column-center">
                                   <div class="settings-container__header common_padding_left_10px">Settings</div>
                                   <div class="settings-option settings-option_first-day-week settings-container__settings-option common-flex-column">
-                                  <div class="settings-option__caption common_padding_left_10px">Select the 1st day of the week:</div>
+                                    <div class="settings-option__caption common_padding_left_10px">Select the 1st day of the week:</div>
                                   </div>
                                   <div class="settings-option settings-container__settings-option settings-option_weekends-select common-flex-column">
-                                  <div class="settings-option__caption common_padding_left_10px">Select weekends:</div>
+                                    <div class="settings-option__caption common_padding_left_10px">Select weekends:</div>
                                   </div>
                                   <div class="settings-option settings-option_one-line settings-container__settings-option settings-option_other-month-show common-flex-row-between-center">
-                                  <div class="settings-option__caption common_padding_left_10px">Show another months days</div>
+                                    <div class="settings-option__caption common_padding_left_10px">Show another months days</div>
                                   </div>
                                   <div class="settings-option settings-option_one-line settings-container__settings-option settings-option_schedule-active common-flex-row-between-center">
-                                  <div class="settings-option__caption common_padding_left_10px">Task schedule active</div>
+                                    <div class="settings-option__caption common_padding_left_10px">Task schedule active</div>
                                   </div>
                               </div>`;
         Framework.initDomPortal("task-schedule-section", ["task-schedule-section__settings-container", "common-flex-column-between-center"], injectedHtml, ["settings-container"]);
@@ -608,25 +705,14 @@ class Timetable {
     }
 
     renderDaySummary() {
-        const dayType = this.dayTypeDetermination();
-        const injectedHtml = `<div class="day-summary__day-type">This day is${dayType}</div>
-                              <div class="day-summary__day-info"></div>`;
+        const injectedHtml = `<div class="day-summary__selected-date"></div>
+                                <div class="day-information day-summary__day-information">
+                                    <div class="day-information__type"></div>
+                                    <div class="day-information__caption"></div>
+                                </div>
+                                <div class="selected-day-weather day-summary__selected-day-weather"></div>
+                                <div class="day-task-section day-summary__day-task-section"></div>`;
         Framework.initDomPortal("main-container__task-schedule-section", ["common-flex-column"], injectedHtml, ["day-summary", "task-schedule-section__day-summary"]);
-    }
-
-    renderWeatherInfo() {
-        const dayTemperature = Framework.getFirstElementByClassName("temperature-icon-wrapper__temperature-value");
-        const dayTemperatureValue = this.getWeatherForecastData().current.temp;
-        Framework.injectElementInnerText(dayTemperature, `${dayTemperatureValue} ℃`)
-        const weatherIcon = Framework.getFirstElementByClassName("temperature-icon-wrapper__weather-icon");
-        const weatherIconValue = this.getWeatherForecastData().current.weather[0].icon;
-        Framework.setDomElementAttribute(weatherIcon, `http://openweathermap.org/img/wn/${weatherIconValue}@2x.png`, "src");
-        const weatherDescription = Framework.getFirstElementByClassName("day-weather-segment__weather-description");
-        const weatherDescriptionValue = this.getWeatherForecastData().current.weather[0].description;
-        Framework.injectElementInnerText(weatherDescription, weatherDescriptionValue);
-        const feelsLike = Framework.getFirstElementByClassName("day-weather-segment__feels-like");
-        const feelsLikeValue = this.getWeatherForecastData().current.feels_like;
-        Framework.injectElementInnerText(feelsLike, `Feels like ${feelsLikeValue}`);
     }
 
     initSettingsContainer() {
@@ -639,7 +725,10 @@ class Timetable {
     }
 
     initDaySummary() {
-        //this.renderDaySummary();
+        const parent = Framework.getFirstElementByClassName("main-container__task-schedule-section");
+        Framework.clearElementInnerHtml(parent);
+        this.renderDaySummary();
+        this.bindDataDaySummary()
     }
 
     //--------------------------//
@@ -656,8 +745,8 @@ class Timetable {
         /* test */
 
         this.initDaySummary();
-        this.renderWeatherInfo();
-        
+
+
     }
 
     //--------------------------//
@@ -737,7 +826,17 @@ class Timetable {
 
 
 
+    bindMouthMove() {
+        const daysContainer = document.getElementsByClassName("month-segment__days-container")[0];
+        const daysContainerBackground = document.getElementsByClassName("days-container__background")[0];
+        this.subscribeToMouseMove(daysContainerBackground, daysContainer);
+    }
 
+    bindDataDaySummary() {
+        const selectedDate = Framework.getFirstElementByClassName("day-summary__selected-date");
+        const dayType = Framework.getFirstElementByClassName("day-information__type");
+
+    }
 
 
 
@@ -745,6 +844,26 @@ class Timetable {
         const dateComponent = document.getElementsByClassName("date-component")[0];
         const timeMark = this.getCurrentDate();
         this.dateInjection(dateComponent, timeMark);
+    }
+
+    /**
+     * Subscribes geometric center of selected element to mouse move at movement field.
+     * @param {Element} subscribedElement - Element that subscribed to mouse.
+     * @param {Element} fieldOfObjectMovement - Element inside that subscribed element move. 
+     */
+    subscribeToMouseMove(subscribedElement, fieldOfObjectMovement) {
+        if (arguments.length < 2) {
+            throw new Error("ObjectMotionSubscribeError: calls with wrong quantity of arguments");
+        }
+        if (((subscribedElement instanceof Element) === false) || ((fieldOfObjectMovement instanceof Element) === false)) {
+            throw new Error("ObjectMotionSubscribeError: calls with wrong type of arguments");
+        }
+        fieldOfObjectMovement.addEventListener("mousemove", (e) => {
+            const subscribedElementRect = subscribedElement.getBoundingClientRect();
+            const fieldOfObjectMovementRect = fieldOfObjectMovement.getBoundingClientRect();
+            subscribedElement.style.left = (e.pageX - fieldOfObjectMovementRect.x - (subscribedElementRect.width / 2)) + "px";
+            subscribedElement.style.top = (e.pageY - fieldOfObjectMovementRect.y - (subscribedElementRect.height / 2)) + "px";
+        })
     }
 
 
@@ -795,6 +914,10 @@ class Timetable {
         this.fillDaysContainerSelectedDate();
         this.fillDaysOfWeekCaption();
         this.subscribeDateTimeSegmentChangeCurrentTime();
+        this.bindMouthMove();
+        //const parent = Framework.getFirstElementByClassName("calendar-section__day-weather-segment")
+        //const currentWeatherModule = new CurrentWeatherModule(parent, {})
+
     };
 
 }

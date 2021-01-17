@@ -1,0 +1,36 @@
+.temperature-icon-wrapper__weather-icon{
+    background-size: cover;
+
+    width: 100px;
+    height: 100px;
+
+    margin: -10px;
+}
+
+.current-temperature__caption {
+    font-size: 2.3em;
+}
+
+.day-weather-segment__weather-description, .day-weather-segment__location {
+    font-size: 1.2em;
+
+    font-style: italic;
+
+    text-transform: capitalize;
+}
+
+.current-temperature__measure-units{
+    font-size: 1.5em;
+
+    padding-left: 5px;
+}
+
+.feels-like-temperature__description{
+    font-size: 1.2em;
+}
+
+.feels-like-temperature__caption{
+    font-size: 1.5em;
+
+    padding-left: 5px;
+}

@@ -230,25 +230,25 @@ function constructElement(type, parent, classes, text = "") {
 //     fillNextMonth(elementContainer, date);
 // }
 
-/**
- * Subscribes geometric center of selected element to mouse move at movement field.
- * @param {Element} subscribedElement - Element that subscribed to mouse.
- * @param {Element} fieldOfObjectMovement - Element inside that subscribed element move. 
- */
-function subscribeToMouseMove(subscribedElement, fieldOfObjectMovement) {
-    if (arguments.length < 2) {
-        throw new Error("ObjectMotionSubscribeError: calls with wrong quantity of arguments");
-    }
-    if (((subscribedElement instanceof Element) === false) || ((fieldOfObjectMovement instanceof Element) === false)) {
-        throw new Error("ObjectMotionSubscribeError: calls with wrong type of arguments");
-    }
-    fieldOfObjectMovement.addEventListener("mousemove", (e) => {
-        const subscribedElementRect = subscribedElement.getBoundingClientRect();
-        const fieldOfObjectMovementRect = fieldOfObjectMovement.getBoundingClientRect();
-        subscribedElement.style.left = (e.pageX - fieldOfObjectMovementRect.x - (subscribedElementRect.width / 2)) + "px";
-        subscribedElement.style.top = (e.pageY - fieldOfObjectMovementRect.y - (subscribedElementRect.height / 2)) + "px";
-    })
-}
+// /**
+//  * Subscribes geometric center of selected element to mouse move at movement field.
+//  * @param {Element} subscribedElement - Element that subscribed to mouse.
+//  * @param {Element} fieldOfObjectMovement - Element inside that subscribed element move. 
+//  */
+// function subscribeToMouseMove(subscribedElement, fieldOfObjectMovement) {
+//     if (arguments.length < 2) {
+//         throw new Error("ObjectMotionSubscribeError: calls with wrong quantity of arguments");
+//     }
+//     if (((subscribedElement instanceof Element) === false) || ((fieldOfObjectMovement instanceof Element) === false)) {
+//         throw new Error("ObjectMotionSubscribeError: calls with wrong type of arguments");
+//     }
+//     fieldOfObjectMovement.addEventListener("mousemove", (e) => {
+//         const subscribedElementRect = subscribedElement.getBoundingClientRect();
+//         const fieldOfObjectMovementRect = fieldOfObjectMovement.getBoundingClientRect();
+//         subscribedElement.style.left = (e.pageX - fieldOfObjectMovementRect.x - (subscribedElementRect.width / 2)) + "px";
+//         subscribedElement.style.top = (e.pageY - fieldOfObjectMovementRect.y - (subscribedElementRect.height / 2)) + "px";
+//     })
+// }
 
 /**
  * Injects timetable HTML code into element-portal with selector "timetable-section".
@@ -291,7 +291,7 @@ function attachTimeTableActivities() {
  */
 function initTimeTable() {
     // createTimeTablePortal();
-    attachTimeTableActivities();
+    //attachTimeTableActivities();
 }
 
 
