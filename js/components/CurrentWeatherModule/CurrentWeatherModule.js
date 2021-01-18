@@ -3,8 +3,8 @@
 class CurrentWeatherModule {
     constructor(parentElement, props) {
         this.state = {
-            currentWeather: {},
-            currentLocation: {}
+            currentWeather: props.weather,
+            currentLocation: props.location
         }
         this.parentElement = parentElement;
         this.props = props;
@@ -46,11 +46,11 @@ class CurrentWeatherModule {
         const feelsLikeValue = Math.round(this.state.currentWeather.current.feels_like);
         Framework.injectElementInnerText(feelsLike, feelsLikeValue);
         const location = Framework.getFirstElementByClassName("day-weather-segment__location");
+        const locationValue = this.state.currentLocation.response.GeoObjectCollection.featureMember[0].GeoObject.description
+        Framework.injectElementInnerText(location, locationValue);
     }
 
     initWeatherModule() {
-        this.requestWeatherForecastData();
-        this.requestUserLocation();
         this.renderWeatherModuleDomTree();
         this.fillWeatherInfo();
     }

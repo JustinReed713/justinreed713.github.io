@@ -1,7 +1,7 @@
 class Timetable {
     constructor() {
         this.state = {
-            settings: settings,
+            settings: null,
             selectedMonthIncrement: 0,
             isSettingsOpen: false,
             selectedDate: this.getCurrentDate(),
@@ -33,9 +33,8 @@ class Timetable {
             "Friday",
             "Saturday"
         ];
-        //this.requestWeatherForecastData();
-        //this.getSettingsRequest();
-        this.initTimetable();
+        this.getSettingsRequest(this.makeRequest, this);
+
         this.setPreviousState(this.state);
     }
 
@@ -119,16 +118,16 @@ class Timetable {
         return (new Date());
     };
 
-    getSettingsRequest() {
-        // if(this.state.settings === null) {
-        //     this.setSettings(settings)
-        // }
 
-        // const reader = new FileReader();
-        // reader.readAsText("./config.json");
-        // reader.onload = function () {
-        //     console.log(reader.result)
-        // }
+    callSettings() {
+        if (this.state.settings === null) {
+            this.getSettingsRequest()
+        }
+    }
+
+
+    getSettingsRequest(method, callObject) {
+        const object = this;
 
         function readTextFile(file, callback) {
             var rawFile = new XMLHttpRequest();
@@ -145,7 +144,8 @@ class Timetable {
         //usage:
         readTextFile("./config.json", function (text) {
             var data = JSON.parse(text);
-            console.log(data);
+            object.setSettings(data.settings)
+            method.call(callObject)
         });
     }
 
@@ -173,7 +173,7 @@ class Timetable {
     }
 
     getUserPosition() {
-        return this, this.getCurrentState().userPosition;
+        return this.getCurrentState().userPosition;
     }
 
     getCurrentPosition() {
@@ -221,18 +221,15 @@ class Timetable {
                 if (position.coords) {
                     const locationData = { latitude: position.coords.latitude, longitude: position.coords.longitude }
                     object.setUserPosition(locationData)
+                    if (additionalFunction) {
+                        additionalFunction.call(callObject);
+                    }
+                    return position;
                 } else {
                     console.error('Geolocation is not supported by this browser.');
                 }
                 return position;
             }
-            ).then(
-                position => {
-                    if (additionalFunction) {
-                        additionalFunction(position, callObject);
-                    }
-                    return position;
-                }
             ).catch(
                 error => console.error(error)
             )
@@ -240,50 +237,44 @@ class Timetable {
 
 
     makeRequest() {
-        const object = this;
-        this.callPositionRequest(object.combinedRequest, object)
+        this.callPositionRequest(this.combinedRequest, this)
     }
 
 
 
 
-    requestWeatherForecastData(additionalFunction, callObject) {
-        const latitude = callObject.getUserPosition().latitude;
-        const longitude = callObject.getUserPosition().longitude;
-        fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&exclude=minutely,alerts&units=metric&appid=fa89f5efb789b4e5e23e5761db403636`)
-            .then(response => response.json())
-            .then(data => {
-                callObject.setWeatherForecastData(data);
-                return data;
+    requestWeatherForecastData(additionalFunction) {
+        const latitude = this.getUserPosition().latitude;
+        const longitude = this.getUserPosition().longitude;
+        return new Promise((resolve, reject) => setTimeout(() => {
+            resolve(
+                fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&exclude=minutely,alerts&units=metric&appid=fa89f5efb789b4e5e23e5761db403636`)
+                    .then(response => response.json())
+                    .then(data => {
+                        this.setWeatherForecastData(data);
+                        return data;
+                    }))
+        }, 0))
+    }
+
+    requestUserLocation(additionalFunction) {
+        const coordinatesRequest = `${this.getUserPosition().longitude},${this.getUserPosition().latitude}`;
+        return new Promise((resolve, reject) => setTimeout(() => {
+            resolve(fetch(`https://geocode-maps.yandex.ru/1.x/?apikey=2317cb5b-df6a-48f6-b15f-abd253896d8b&geocode=${coordinatesRequest}&format=json&lang=en_US`)
+                .then(response => response.json())
+                .then(data => {
+                    this.setUserLocationData(data);
+                    return data
+                }))
+        }, 0))
+    }
+
+    combinedRequest() {
+        const promises = [this.requestWeatherForecastData(), this.requestUserLocation()]
+        Promise.allSettled(promises)
+            .then(results => {
+                this.initTimetable()
             })
-            .then(data => {
-                if (additionalFunction) {
-                    additionalFunction(data, callObject)
-                }
-                return data;
-            });
-
-    }
-
-    requestUserLocation(additionalFunction, callObject) {
-        const coordinatesRequest = `${callObject.getUserPosition().longitude},${callObject.getUserPosition().latitude}`;
-        fetch(`https://geocode-maps.yandex.ru/1.x/?apikey=2317cb5b-df6a-48f6-b15f-abd253896d8b&geocode=${coordinatesRequest}&format=json&lang=en_US`)
-            .then(response => response.json())
-            .then(data => {
-                callObject.setUserLocationData(data);
-                return data
-            })
-            .then(data => {
-                if (additionalFunction) {
-                    additionalFunction(data, callObject)
-                }
-                return data;
-            });
-    }
-
-    combinedRequest(data, object) {
-        object.requestWeatherForecastData(() => { }, object);
-        object.requestUserLocation(() => { }, object);
     }
 
 
@@ -906,6 +897,7 @@ class Timetable {
     /* init components */
 
     initTimetable() {
+        const object = this;
         this.renderTimetableTree();
 
 
@@ -917,8 +909,8 @@ class Timetable {
         this.fillDaysOfWeekCaption();
         this.subscribeDateTimeSegmentChangeCurrentTime();
         this.bindMouthMove();
-        //const parent = Framework.getFirstElementByClassName("calendar-section__day-weather-segment")
-        //const currentWeatherModule = new CurrentWeatherModule(parent, {})
+        const parent = Framework.getFirstElementByClassName("calendar-section__day-weather-segment")
+        const currentWeatherModule = new CurrentWeatherModule(parent, { weather: object.getWeatherForecastData(), location: object.getUserLocationData() })
 
     };
 
