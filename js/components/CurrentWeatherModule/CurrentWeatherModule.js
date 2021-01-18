@@ -38,7 +38,7 @@ class CurrentWeatherModule {
         Framework.injectElementInnerText(dayTemperature, dayTemperatureValue)
         const weatherIcon = Framework.getFirstElementByClassName("temperature-icon-wrapper__weather-icon");
         const weatherIconValue = this.state.currentWeather.current.weather[0].icon;
-        Framework.setDomElementAttribute(weatherIcon, `background-image: url("http://openweathermap.org/img/wn/${weatherIconValue}@2x.png");`, "style");
+        Framework.setDomElementAttribute(weatherIcon, `background-image: url("https://openweathermap.org/img/wn/${weatherIconValue}@2x.png");`, "style");
         const weatherDescription = Framework.getFirstElementByClassName("day-weather-segment__weather-description");
         const weatherDescriptionValue = this.state.currentWeather.current.weather[0].description;
         Framework.injectElementInnerText(weatherDescription, `"${weatherDescriptionValue}"`);

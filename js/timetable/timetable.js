@@ -1,7 +1,7 @@
 class Timetable {
     constructor() {
         this.state = {
-            settings: null,
+            settings: new LocalStorage("TimeTableApp"),
             selectedMonthIncrement: 0,
             isSettingsOpen: false,
             selectedDate: this.getCurrentDate(),
@@ -33,8 +33,7 @@ class Timetable {
             "Friday",
             "Saturday"
         ];
-        this.getSettingsRequest(this.makeRequest, this);
-
+        this.callSettings();
         this.setPreviousState(this.state);
     }
 
@@ -45,19 +44,19 @@ class Timetable {
     };
 
     setFirstDay(value) {
-        this.state.settings.isFirstDaySunday = value;
+        this.state.settings.updateDataAtStorage({ isFirstDaySunday: value });
     };
 
     setSiblingsMonthsShowed(value) {
-        this.state.settings.isSiblingsMonthsShowed = value;
+        this.state.settings.updateDataAtStorage({ isSiblingsMonthsShowed: value });
     };
 
     setScheduleActive(value) {
-        this.state.settings.isScheduleActive = value;
+        this.state.settings.updateDataAtStorage({ isScheduleActive: value });
     };
 
     setHolidaysIndex(array) {
-        this.state.settings.holidaysIndex = array;
+        this.state.settings.updateDataAtStorage({ holidaysIndex: array });
     };
 
     setSettingsOpen(value) {
@@ -81,7 +80,7 @@ class Timetable {
     };
 
     setSettings(value) {
-        this.state.settings = value;
+        this.state.settings.setDataAtStorage(value);
     }
 
     /* getters */
@@ -95,23 +94,23 @@ class Timetable {
     }
 
     getFirstDay() {
-        return this.getCurrentState().settings.isFirstDaySunday
+        return this.getCurrentState().settings.getDataFromStorage().isFirstDaySunday
     }
 
     getSiblingsMonthsShowed() {
-        return this.getCurrentState().settings.isSiblingsMonthsShowed
+        return this.getCurrentState().settings.getDataFromStorage().isSiblingsMonthsShowed
     };
 
     getScheduleActive() {
-        return this.getCurrentState().settings.isScheduleActive
+        return this.getCurrentState().settings.getDataFromStorage().isScheduleActive
     };
 
     getHolidaysIndex() {
-        return this.getCurrentState().settings.holidaysIndex;
+        return this.getCurrentState().settings.getDataFromStorage().holidaysIndex;
     }
 
     getHolidaysList() {
-        return this.getCurrentState().settings.holidaysList
+        return this.getCurrentState().settings.getDataFromStorage().holidaysList
     }
 
     getCurrentDate() {
@@ -120,8 +119,12 @@ class Timetable {
 
 
     callSettings() {
-        if (this.state.settings === null) {
-            this.getSettingsRequest()
+        if (this.state.settings.getDataFromStorage() === null) {
+            this.getSettingsRequest(this.makeRequest, this);
+            console.log("loaded from JSON config file")
+        } else {
+            this.makeRequest()
+            console.log("loaded from local storage")
         }
     }
 

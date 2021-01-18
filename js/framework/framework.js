@@ -23,6 +23,9 @@ class LocalStorage {
 
     updateDataAtStorage(data) {
         let currentDataAtStorage = this.getDataFromStorage();
+        if(currentDataAtStorage === null) {
+            currentDataAtStorage = {}
+        }
         Object.assign(currentDataAtStorage, data);
         return this.setDataAtStorage(currentDataAtStorage);
     }
