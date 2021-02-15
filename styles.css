@@ -1,14 +1,7 @@
-@import "./styles/common/reset.css";
-@import "./styles/common/fonts.css";
-@import "./styles/components/beautified-button/beautified-button.css";
+/* You can add global styles to this file, and also import other style files */
+* {
+  margin: 0px;
+  padding: 0px;
+}
 
-
-@import "./styles/index.css";
-@import "./styles/components/calendar-section/calendar-section.css";
-@import "./styles/components/task-schedule-section/task-schedule.css";
-
-
-@import "./styles/components/task-schedule-section/input-checkbox/input-checkbox.css";
-
-@import "./styles/common/common.css";
-@import "./styles/common/globals.css";
+/*# sourceMappingURL=styles.css.map*/
