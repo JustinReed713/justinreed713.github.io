@@ -68,7 +68,7 @@ class SettingsService {
             control: {
                 rocketSpeed: 10,
                 isMouseControl: false,
-                isAutoGame: true
+                isAutoGame: false
             },
             audio: {
                 volume: 0.5,
@@ -641,31 +641,31 @@ class SoundService {
                 src: ['../../assets/sounds/backgroundMusic.mp3'],
                 autoplay: true,
                 loop: true,
-                volume: 0
+                volume: 0.25
             }),
             gameStart: new howler__WEBPACK_IMPORTED_MODULE_0__["Howl"]({
                 src: ['../assets/sounds/gameStart.ogg'],
-                volume: 0
+                volume: 0.25
             }),
             brickBump: new howler__WEBPACK_IMPORTED_MODULE_0__["Howl"]({
                 src: ['../assets/sounds/brickBump.wav'],
-                volume: 0
+                volume: 0.25
             }),
             playerBump: new howler__WEBPACK_IMPORTED_MODULE_0__["Howl"]({
                 src: ['../assets/sounds/playerBump.wav'],
-                volume: 0
+                volume: 0.25
             }),
             borderBump: new howler__WEBPACK_IMPORTED_MODULE_0__["Howl"]({
                 src: ['../assets/sounds/playerBump.wav'],
-                volume: 0
+                volume: 0.25
             }),
             gameOver: new howler__WEBPACK_IMPORTED_MODULE_0__["Howl"]({
                 src: ['../assets/sounds/gameOver.wav'],
-                volume: 0
+                volume: 0.25
             }),
             youWin: new howler__WEBPACK_IMPORTED_MODULE_0__["Howl"]({
                 src: ['../assets/sounds/youWin.wav'],
-                volume: 0
+                volume: 0.25
             })
         };
     }
